@@ -41,14 +41,18 @@ public class Profile extends Activity implements View.OnClickListener {
     TextView nameTV, emailTV;
     Context ctx = this;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile);
 
+        //initialize variables for layout references
         nameTV = (TextView) findViewById(R.id.Name);
         emailTV = (TextView) findViewById(R.id.Username);
+        chooseImage = (ImageView) findViewById(R.id.chooseImage);
+        bUploadImage = (Button) findViewById(R.id.bUpload);
+
+        //get name & username input from Login
         name = getIntent().getStringExtra("name");
         username = getIntent().getStringExtra("email");
         nameTV.setText(name);
@@ -57,6 +61,7 @@ public class Profile extends Activity implements View.OnClickListener {
         TabHost host = (TabHost)findViewById(R.id.tabHost);
         host.setup();
 
+        //create tabs
         TabHost.TabSpec spec = host.newTabSpec("Tab 1");
         spec.setContent(R.id.tab1);
         spec.setIndicator("My Art");
@@ -72,19 +77,27 @@ public class Profile extends Activity implements View.OnClickListener {
         spec.setIndicator("Upload");
         host.addTab(spec);
 
+        //helper method
         loadGridViewHelper();
 
-        chooseImage = (ImageView) findViewById(R.id.chooseImage);
-        bUploadImage = (Button) findViewById(R.id.bUpload);
-
+        //listen for image selection or upload
         chooseImage.setOnClickListener(this);
         bUploadImage.setOnClickListener(this);
     }
 
+    //called when app is initialized and after new image is uploaded
     public void loadGridViewHelper(){
+
+        uploadName = (EditText) findViewById(R.id.etName);
+        uploadMat = (EditText) findViewById(R.id.etDescription);
+        uploadDesc = (EditText) findViewById(R.id.etMaterials);
+        chooseImage = (ImageView) findViewById(R.id.chooseImage);
+
+        //initialize gridview and call helper ImageAdapter class
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(this));
 
+        //for image click, open activity 'Details' and pass id parameter
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id){
                 Intent i = new Intent(getApplicationContext(), Details.class);
@@ -93,11 +106,7 @@ public class Profile extends Activity implements View.OnClickListener {
             }
         });
 
-        uploadName = (EditText) findViewById(R.id.etName);
-        uploadMat = (EditText) findViewById(R.id.etDescription);
-        uploadDesc = (EditText) findViewById(R.id.etMaterials);
-        chooseImage = (ImageView) findViewById(R.id.chooseImage);
-
+        //clear entry fields after upload
         uploadName.setText("");
         uploadMat.setText("");
         uploadDesc.setText("");
@@ -107,13 +116,9 @@ public class Profile extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
-        uploadName = (EditText) findViewById(R.id.etName);
-        uploadMat = (EditText) findViewById(R.id.etMaterials);
-        uploadDesc = (EditText) findViewById(R.id.etDescription);
-
-        title = uploadName.getText().toString();
-        materials = uploadMat.getText().toString();
-        description = uploadDesc.getText().toString();
+        title = ((EditText) findViewById(R.id.etName)).getText().toString();
+        materials = ((EditText) findViewById(R.id.etMaterials)).getText().toString();
+        description = ((EditText) findViewById(R.id.etDescription)).getText().toString();
 
         switch(v.getId()){
 
@@ -132,7 +137,7 @@ public class Profile extends Activity implements View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //verify chosen image from gallery, set image in our view
+        //chosen image from gallery, set image in view
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri selectedImage = data.getData();
             chooseImage.setImageURI(selectedImage);
@@ -155,10 +160,11 @@ public class Profile extends Activity implements View.OnClickListener {
             this.description = description;
         }
 
-        //UPLOAD IMAGE: run task asynchronously, don't slow down UI thread
+        //upload image: run task asynchronously, don't slow down UI thread
         @Override
         protected Void doInBackground(Void... params) {
 
+            //compress bitmap to string
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
             String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
@@ -171,12 +177,15 @@ public class Profile extends Activity implements View.OnClickListener {
 
             try {
 
+                //connecting to server & pass parameters
                 URL url = new URL(SERVER_ADDRESS + "savePic.php");
                 String urlParams = "username=" + username + "&image=" + encodedStr + "&title=" + title + "&materials=" + materials + "&description=" + description;
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
                 Profile app = (Profile) ctx;
                 String[] values = {materials, description, username};
+
+                //add uploaded image to our HashMap class of artwork data
                 ((LoadUserArt) app.getApplication()).addMyArt(title, values);
 
                 con.setDoOutput(true);
@@ -195,10 +204,10 @@ public class Profile extends Activity implements View.OnClickListener {
             return null;
         }
 
-        //toast: tells user image was uploaded
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            //display success message to user
             Toast.makeText(getApplicationContext(), "Image Uploaded", Toast.LENGTH_SHORT).show();
             loadGridViewHelper();
         }

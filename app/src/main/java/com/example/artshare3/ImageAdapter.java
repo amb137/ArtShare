@@ -19,9 +19,11 @@ public class ImageAdapter extends BaseAdapter {
     private Context context;
     HashMap<String, String[]> myArtHash;
 
-    // Constructor
+    // constructor
     public ImageAdapter(Context context) {
         this.context = context;
+
+        //load Android Universal Image loader library
         imageLoader = ImageLoader.getInstance();
         imageLoader.init(ImageLoaderConfiguration.createDefault(context));
         options = new DisplayImageOptions.Builder()
@@ -32,10 +34,12 @@ public class ImageAdapter extends BaseAdapter {
                 .showImageOnLoading(R.drawable.loadimage)
                 .build();
 
+        //set local HashTable to HashTable class with stored art data from server & initialize arrays to these values
         myArtHash = ((LoadUserArt) ((Activity)context).getApplication()).getMyArt();
         myArtTitles = myArtHash.keySet().toArray();
         myArtDetails = new String[myArtTitles.length][3];
 
+        //fill 2D details table with information from each work
         for (int i=0; i<myArtTitles.length; i++) {
             String[] cur = myArtHash.get(myArtTitles[i]);
             myArtDetails[i] = cur;
@@ -58,6 +62,7 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
 
+        //set each image view to image saved on the server
         if (convertView == null) {
             imageView = new ImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(300, 300));
@@ -66,11 +71,12 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
+        //sample address: "http://10.0.2.2:8888/pictures/username/title.JPG"
         imageLoader.displayImage(SERVER_ADDRESS + "pictures/" + myArtDetails[position][2] + "/" +  myArtTitles[position].toString() + ".JPG", imageView, options);
         return imageView;
     }
 
-    public Object[] myArtTitles;
-    public String[][] myArtDetails;
+    public Object[] myArtTitles;            //array to store titles of artwork
+    public String[][] myArtDetails;         //array to store artwork materials, descriptions, user
 
 }

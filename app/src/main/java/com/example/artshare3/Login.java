@@ -32,16 +32,19 @@ public class Login extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+
+        //initialize variables for layout references
         email = (EditText) findViewById(R.id.main_email);
         password = (EditText) findViewById(R.id.main_password);
         ((LoadUserArt) this.getApplication()).setMyArt(new HashMap());
-
     }
 
+    //on register button click, open Register page
     public void main_register(View v){
         startActivity(new Intent(this,Register.class));
     }
 
+    //on login button click, attempt server connection
     public void main_login(View v){
         Email = email.getText().toString();
         Password = password.getText().toString();
@@ -49,6 +52,7 @@ public class Login extends Activity {
         b.execute(Email, Password);
     }
 
+    //login: run task asynchronously, don't slow down UI thread
     class BackGround extends AsyncTask<String, String, String> {
 
         @Override
@@ -59,6 +63,7 @@ public class Login extends Activity {
             int tap;
 
             try {
+                //connecting to server & pass email, password parameters
                 URL url = new URL(SERVER_ADDRESS + "login.php");
                 String urlParams = "email="+email+"&password="+password;
 
@@ -90,6 +95,7 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(String s) {
             try {
+                //on success, pass user data to profile page
                 JSONObject root = new JSONObject(s);
                 JSONObject data = root.getJSONObject("data");
 
@@ -97,7 +103,12 @@ public class Login extends Activity {
                 PASSWORD = data.getString("password");
                 EMAIL = data.getString("email");
 
+                //new connection to load users artwork into HashMap class
+                LoadUserArtData bb = new LoadUserArtData();
+                bb.execute(Email);
+
             } catch (JSONException e) {
+                //on error, display failure message to user
                 e.printStackTrace();
                 AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
                 builder.setMessage("Incorrect Login")
@@ -106,12 +117,10 @@ public class Login extends Activity {
                         .show();
                 return;
             }
-
-            LoadUserArtData bb = new LoadUserArtData();
-            bb.execute(Email);
         }
     }
 
+    //connect to server & load user artwork data into HashMap class
     private class LoadUserArtData extends AsyncTask<String, String, String> {
 
         @Override
@@ -121,6 +130,7 @@ public class Login extends Activity {
             int tap;
 
             try {
+                //connecting to server with username
                 URL url = new URL(SERVER_ADDRESS + "loadPics.php");
                 String urlParams = "username="+username;
 
@@ -155,9 +165,11 @@ public class Login extends Activity {
             HashMap<String, String[]> myArt = new HashMap<>();
 
             try {
+                //on success, store artwork data from server in hashmap & start profile activity
                 JSONObject root = new JSONObject(s);
                 JSONArray jArray = root.getJSONArray("artwork");
 
+                //iterate through json array of artwork on server & store in local HashMap
                 for (int i = 0; i < jArray.length(); i++) {
                     JSONObject cur = jArray.getJSONObject(i);
                     String key = cur.getString("title");
@@ -165,8 +177,11 @@ public class Login extends Activity {
                     myArt.put(key, values);
                 }
                 Login app = (Login) ctx;
+
+                //set HashMap class of artwork data to local HashMap created from server
                 ((LoadUserArt) app.getApplication()).setMyArt(myArt);
 
+                //open profile activity & pass user data
                 Intent i = new Intent(ctx, Profile.class);
                 i.putExtra("name", NAME);
                 i.putExtra("password", PASSWORD);
@@ -174,6 +189,7 @@ public class Login extends Activity {
                 startActivity(i);
 
             } catch (JSONException e) {
+                //on error, display failure message to user
                 e.printStackTrace();
                 err = "Exception: " +e.getMessage();
                 AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);

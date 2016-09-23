@@ -18,6 +18,13 @@ public class Details extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.details);
 
+        //initialize variables for layout references
+        ImageView imageView = (ImageView) findViewById(R.id.DetailImage);
+        TextView curTitle = (TextView) findViewById(R.id.tvTitle);
+        TextView curMat = (TextView) findViewById(R.id.tvMaterials);
+        TextView curDesc = (TextView) findViewById(R.id.tvDescription);
+
+        //load Android Universal Image loader library
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.init(ImageLoaderConfiguration.createDefault(Details.this));
         DisplayImageOptions options = new DisplayImageOptions.Builder()
@@ -28,21 +35,18 @@ public class Details extends Activity {
                 .showImageOnLoading(R.drawable.loadimage)
                 .build();
 
-
+        //get image position on grid from ImageAdapter
         Intent i = getIntent();
         int position = i.getExtras().getInt("id");
         ImageAdapter imageAdapter = new ImageAdapter(this);
 
+        //set variables for additional image's artwork information
         String title = imageAdapter.myArtTitles[position].toString();
         String materials = imageAdapter.myArtDetails[position][0];
         String description = imageAdapter.myArtDetails[position][1];
         String username = imageAdapter.myArtDetails[position][2];
 
-        ImageView imageView = (ImageView) findViewById(R.id.DetailImage);
-        TextView curTitle = (TextView) findViewById(R.id.tvTitle);
-        TextView curMat = (TextView) findViewById(R.id.tvMaterials);
-        TextView curDesc = (TextView) findViewById(R.id.tvDescription);
-
+        //load image and information into current page
         imageLoader.displayImage(SERVER_ADDRESS + "pictures/" + username + "/" + title + ".JPG", imageView, options);
         curTitle.setText(title);
         curMat.setText(materials);

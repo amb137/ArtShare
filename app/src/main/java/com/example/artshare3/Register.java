@@ -29,11 +29,14 @@ public class Register extends Activity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
+
+        //initialize variables for layout references
         name = (EditText) findViewById(R.id.register_name);
         password = (EditText) findViewById(R.id.register_password);
         email = (EditText) findViewById(R.id.register_email);
     }
 
+    //on register button click, attempt server connection
     public void register_register(View v){
         Name = name.getText().toString();
         Password = password.getText().toString();
@@ -42,6 +45,7 @@ public class Register extends Activity {
         b.execute(Name, Password, Email);
     }
 
+    //register: run task asynchronously, don't slow down UI thread
     class BackGround extends AsyncTask<String, String, String> {
 
         @Override
@@ -53,6 +57,7 @@ public class Register extends Activity {
             int tap;
 
             try {
+                //connecting to server & pass name, email, password parameters
                 URL url = new URL(SERVER_ADDRESS + "register.php");
                 String urlParams = "name="+name+"&password="+password+"&email="+email;
 
@@ -81,18 +86,21 @@ public class Register extends Activity {
 
         @Override
         protected void onPostExecute(String s) {
-            if(s.equals("taken")) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
-                builder.setMessage("Error: Username already taken")
-                        .setNegativeButton("Retry", null)
-                        .create()
-                        .show();
-            }
-            else if(s.equals("")){
+//            if(s.equals("taken")) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+//                builder.setMessage("Error: Username already taken")
+//                        .setNegativeButton("Retry", null)
+//                        .create()
+//                        .show();
+//            }
+
+            //message tells user register successful
+            if(s.equals("")){
                 s = "Data saved successfully";
             }
             Toast.makeText(ctx, s, Toast.LENGTH_LONG).show();
 
+            //start login activity for user to login
             Intent i = new Intent(ctx, Login.class);
             startActivity(i);
         }

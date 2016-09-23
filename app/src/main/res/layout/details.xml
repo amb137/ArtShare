@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_weight="0.02"
+        android:paddingTop="10dp"
         android:paddingLeft="20dp"
         android:textColor="#ffffff"/>
 
@@ -38,6 +39,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_weight="0.20"
         android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:paddingBottom="10dp"
         android:textColor="#ffffff"/>
 
