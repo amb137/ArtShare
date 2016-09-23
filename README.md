@@ -8,3 +8,11 @@ The app is designed as a tool to create an art portfolio and sharing work with o
 Future Features
 
 Future versions of the project would include a newsfeed section for users to see other’s work and a pin feature to allow users to mark and save other artwork that inspires them. Additionally, a setting button to allow users to adjust their username, name, and password would be added.
+
+To see a sample profile login with one of the following accounts:
+
+username: annamkbenson 
+password: anna
+
+username: username 
+password: password
