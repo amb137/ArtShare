@@ -13,5 +13,6 @@ To see a sample profile login with one of the following accounts:
 
 username: annamkbenson 
 password: anna
+
 username: username 
 password: password
