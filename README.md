@@ -12,7 +12,9 @@ Future versions of the project would include a newsfeed section for users to see
 To see a sample profile login with one of the following accounts:
 
 username: annamkbenson 
+
 password: anna
 
 username: username 
+
 password: password
